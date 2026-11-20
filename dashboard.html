@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BESTDRUG | Inventory & Dispensing Control</title>
+<style>
+:root{
+  --green:#76b900;--green-press:#5a8d00;--black:#000;--ink:#1a1a1a;
+  --white:#fff;--soft:#f7f7f7;--line:#ccc;--line-strong:#5e5e5e;
+  --muted:#757575;--ash:#a7a7a7;--red:#e52020;--orange:#df6500;
+  --radius:2px;--space:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--white);color:var(--ink);font-family:Inter,"Noto Sans Thai",Arial,Helvetica,sans-serif;font-size:14px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.shell{max-width:1600px;margin:auto;padding:0 28px 40px}
+.hero{background:var(--black);color:var(--white);padding:22px 26px;margin:0 -28px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand-mark{width:44px;height:44px;display:grid;place-items:center;background:var(--green);color:var(--black);font-weight:900;font-size:20px;border-radius:2px;flex:none}
+h1{font-size:23px;line-height:1.25;margin:0 0 5px;font-weight:700}
+.hero-sub{color:rgba(255,255,255,.72);font-size:12px}
+.hero-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nav-link,.hero-chip{border:1px solid var(--line-strong);padding:10px 13px;text-decoration:none;color:#fff;background:transparent;border-radius:2px;font-weight:700;font-size:12px}
+.nav-link:hover{border-color:var(--green);color:var(--green)}
+.hero-chip{color:var(--green);border-color:var(--green)}
+.filebar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.filebox{border:1px solid var(--line);padding:13px;background:var(--white);min-width:0;position:relative}
+.filebox:before{content:"";position:absolute;top:0;left:0;width:12px;height:12px;background:var(--green)}
+.file-title{font-weight:700;font-size:13px;margin:0 0 5px}
+.file-hint{font-size:11px;color:var(--muted);margin:0 0 10px;line-height:1.45}
+.filebox input{width:100%;font-size:11px}
+.file-state{font-size:11px;color:var(--muted);margin-top:7px;min-height:15px}
+.file-state.ok{color:#3f8500;font-weight:700}
+.file-state.bad{color:var(--red);font-weight:700}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;background:var(--soft);border:1px solid var(--line);padding:4px;flex-wrap:wrap}
+.tab{background:transparent;border:0;padding:11px 16px;color:var(--muted);font-size:12px;font-weight:700;border-radius:2px}
+.tab.active{background:var(--black);color:var(--white);box-shadow:inset 3px 0 0 var(--green)}
+.global-meta{font-size:11px;color:var(--muted);text-align:right}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:18px 0 14px}
+.page-head h2{font-size:21px;margin:0 0 4px}
+.page-head p{font-size:12px;color:var(--muted);margin:0}
+.filters{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.filter{display:flex;flex-direction:column;gap:5px;font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
+input,select{border:1px solid var(--line);background:var(--white);color:var(--ink);padding:9px 10px;border-radius:2px;min-height:36px;font-size:12px;outline:none}
+input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+.btn{background:var(--green);border:1px solid var(--green);color:var(--black);padding:10px 14px;font-size:12px;font-weight:700;border-radius:2px}
+.btn:hover{background:var(--green-press);border-color:var(--green-press)}
+.btn-outline{background:#fff;border:1px solid var(--line-strong);color:var(--ink)}
+.btn-outline:hover{border-color:var(--green)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:14px 0 16px}
+.kpi{border:1px solid var(--line);padding:15px 16px;min-height:112px;position:relative;background:#fff}
+.kpi:first-child:before{content:"";position:absolute;left:0;top:0;width:12px;height:12px;background:var(--green)}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:700}
+.kpi-value{font-size:27px;font-weight:700;line-height:1.2;margin:12px 0 3px;letter-spacing:-.5px}
+.kpi-note{font-size:10px;color:var(--muted)}
+.kpi.alert .kpi-value{color:var(--red)}
+.kpi.accent .kpi-value{color:var(--green-press)}
+.layout-2{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-bottom:14px}
+.layout-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.panel{border:1px solid var(--line);padding:17px;min-width:0;position:relative;background:#fff;margin-bottom:14px}
+.panel h3{font-size:14px;margin:0 0 4px}
+.panel-desc{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.panel-corner:before{content:"";position:absolute;left:0;top:0;width:12px;height:12px;background:var(--green)}
+.chart-list{display:grid;gap:11px}
+.bar-row{display:grid;grid-template-columns:minmax(100px,1.2fr) 3fr 56px;gap:9px;align-items:center;font-size:11px}
+.bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{height:10px;background:var(--soft);border:1px solid var(--line);overflow:hidden}
+.fill{height:100%;background:var(--green)}
+.bar-val{text-align:right;font-weight:700}
+.legend-list{display:grid;gap:10px}
+.legend-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.legend-row b{margin-left:auto;color:var(--ink)}
+.swatch{width:10px;height:10px;background:var(--green);flex:none}
+.swatch.gray{background:#a7a7a7}.swatch.red{background:var(--red)}.swatch.orange{background:var(--orange)}.swatch.black{background:#1a1a1a}
+.timeline{display:grid;gap:9px}
+.timeline-row{display:grid;grid-template-columns:100px 1fr 48px;gap:10px;align-items:center;font-size:11px}
+.timeline-label{font-weight:700}
+.timeline-track{height:13px;background:var(--soft);border:1px solid var(--line)}
+.timeline-fill{height:100%;background:var(--green)}
+.table-panel{padding:0;overflow:hidden}
+.table-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.table-head h3{margin:0;font-size:14px}
+.table-tools{display:flex;gap:7px;flex-wrap:wrap}
+.table-tools input,.table-tools select{min-width:150px}
+.table-scroll{overflow:auto;max-height:460px}
+table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+th{position:sticky;top:0;background:var(--soft);text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);font-weight:700;z-index:1}
+td{padding:10px 13px;border-bottom:1px solid #eee}
+tbody tr:hover{background:#f7f7f7}
+.sku{font-weight:700;color:var(--green-press)}
+.pill{display:inline-block;padding:4px 7px;border:1px solid var(--line);font-size:10px;border-radius:2px}
+.pill.ok{color:#3f8500;border-color:#b7d69b;background:#f7fbf1}
+.pill.warn{color:var(--orange);border-color:#e9c6a9;background:#fff9f4}
+.pill.bad{color:var(--red);border-color:#e8b2b2;background:#fff7f7}
+.pill.dark{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.empty{padding:28px;text-align:center;color:var(--muted);font-size:12px}
+.notice{border-left:3px solid var(--green);background:var(--soft);padding:11px 13px;font-size:11px;line-height:1.6;margin:12px 0;color:var(--ink)}
+.notice.warn{border-color:var(--orange)}
+.hidden{display:none!important}
+.footer{background:#000;color:#fff;padding:18px 20px;margin:24px -28px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px}
+.footer a{color:var(--green);text-decoration:none}
+.loading{border:1px dashed var(--line-strong);padding:28px;text-align:center;color:var(--muted);margin:16px 0}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.layout-2{grid-template-columns:1fr}.layout-3{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){
+ .shell{padding:0 13px 28px}.hero{margin:0 -13px 15px;padding:17px 14px;align-items:flex-start;flex-direction:column}
+ h1{font-size:19px}.hero-actions{width:100%}.nav-link,.hero-chip{flex:1;text-align:center}
+ .filebar{grid-template-columns:1fr}.toolbar{align-items:stretch}.tabs{width:100%}.tab{flex:1;padding:10px 8px;font-size:10px}
+ .global-meta{text-align:left}.page-head{align-items:flex-start;flex-direction:column}.filters{width:100%}.filter{flex:1;min-width:130px}
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.kpi{padding:12px;min-height:100px}.kpi-value{font-size:23px}
+ .layout-3{grid-template-columns:1fr}.panel{padding:13px}.table-head{align-items:flex-start;flex-direction:column}.table-tools{width:100%}.table-tools input,.table-tools select{flex:1;min-width:0}
+ .footer{margin-left:-13px;margin-right:-13px;padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="hero">
+ <div class="brand">
+  <div class="brand-mark">BD</div>
+  <div><h1>BESTDRUG · Inventory Intelligence</h1><div class="hero-sub">ระบบติดตามคลังยา · วันหมดอายุ · การจัดซื้อ · ประวัติการจ่ายยา</div></div>
+ </div>
+ <div class="hero-actions">
+  <span class="hero-chip">NVIDIA GREEN · #76b900</span>
+  <a class="nav-link" href="./drug_dashboard.html" target="_self">← กลับหน้า Bestdrug</a>
+ </div>
+</header>
+
+<section class="source-strip" id="sourceBanner" role="status" style="margin-bottom:16px;padding:12px 15px;border:1px solid #3f8500;background:#f1f8e8;color:#285900;font-weight:700">กำลังเชื่อมต่อข้อมูล...</section>
+
+<div class="toolbar">
+ <nav class="tabs" aria-label="Dashboard modes">
+  <button class="tab active" data-mode="stock">01 · Stock Control</button>
+  <button class="tab" data-mode="expiry">02 · Expiry & Purchasing</button>
+  <button class="tab" data-mode="dispense">03 · Dispensing Audit</button>
+ </nav>
+ <div class="global-meta" id="dataMeta">กำลังโหลดข้อมูลจาก /api/data</div>
+</div>
+
+<section id="stockView">
+ <div class="page-head">
+  <div><h2>Stock Control</h2><p>ควบคุมยอดคงเหลือราย SKU / Lot และตรวจสถานะคลัง</p></div>
+  <div class="filters">
+   <label class="filter">สถานะคลัง<select id="stockStatus"><option value="">ทุกสถานะ</option><option value="active">Active</option><option value="quarantine">Quarantine</option><option value="written_off">Written off</option></select></label>
+   <label class="filter">หมวดหมู่ยา<select id="stockCategory"><option value="">ทุกหมวดหมู่</option></select></label>
+  </div>
+ </div>
+ <div class="kpis" id="stockKpis"></div>
+ <div class="layout-2">
+  <div class="panel panel-corner"><h3>ยอดคงเหลือแยกตามสถานะ</h3><p class="panel-desc">แสดงผลรวม qty_on_hand โดยแยกสถานะ ไม่รวมเป็นยอดพร้อมจ่ายทั้งหมด</p><div id="stockStatusChart" class="chart-list"></div></div>
+  <div class="panel"><h3>SKU ที่ต่ำกว่า Reorder Level</h3><p class="panel-desc">คำนวณจากยอด Active ทุกล็อตรวมกัน เทียบกับค่า reorder_level ใน Drug Master</p><div id="reorderPreview" class="chart-list"></div></div>
+ </div>
+ <div class="panel table-panel">
+  <div class="table-head"><h3>รายละเอียดคลังรายล็อต</h3><div class="table-tools"><input id="stockSearch" type="search" placeholder="ค้นหา SKU / ชื่อยา / Lot"><button class="btn btn-outline" id="exportStock">Export CSV</button></div></div>
+  <div class="table-scroll"><table><thead><tr><th>SKU</th><th>ชื่อสามัญ</th><th>Lot</th><th>คงเหลือ</th><th>หน่วย</th><th>สถานะ</th><th>วันหมดอายุ</th><th>Reorder</th></tr></thead><tbody id="stockRows"><tr><td colspan="8" class="empty">กำลังโหลดข้อมูล...</td></tr></tbody></table></div>
+ </div>
+ <div class="notice" id="stockNote">ข้อมูลคงคลังเป็น Snapshot ตามวันที่ as_of ในไฟล์ ไม่ใช่ข้อมูล Real-time</div>
+</section>
+
+<section id="expiryView" class="hidden">
+ <div class="page-head">
+  <div><h2>Expiry & Purchasing</h2><p>จัดลำดับความเสี่ยงวันหมดอายุและเตรียมรายการสั่งซื้อ</p></div>
+  <div class="filters">
+   <label class="filter">เตือนล่วงหน้า<select id="expiryWindow"><option value="30">30 วัน</option><option value="60">60 วัน</option><option value="90" selected>90 วัน</option><option value="180">180 วัน</option><option value="365">365 วัน</option></select></label>
+   <label class="filter">สถานะล็อต<select id="expiryStatus"><option value="active">เฉพาะ Active</option><option value="">ทุกสถานะ</option><option value="quarantine">Quarantine</option><option value="written_off">Written off</option></select></label>
+  </div>
+ </div>
+ <div class="kpis" id="expiryKpis"></div>
+ <div class="layout-2">
+  <div class="panel panel-corner"><h3>ล็อตใกล้หมดอายุ</h3><p class="panel-desc">แสดงเฉพาะล็อตที่มีจำนวนคงเหลือมากกว่า 0 และมีวันหมดอายุ</p><div id="expiryTimeline" class="timeline"></div></div>
+  <div class="panel"><h3>รายการที่ควรพิจารณาสั่งซื้อ</h3><p class="panel-desc">ส่วนต่างระหว่าง Reorder Level กับยอด Active คงเหลือ เป็นเพียงปริมาณขาดจากเกณฑ์</p><div id="purchasePreview" class="chart-list"></div></div>
+ </div>
+ <div class="panel table-panel">
+  <div class="table-head"><h3>ตารางติดตามวันหมดอายุ / กักกัน / ข้อมูลไม่ครบ</h3><div class="table-tools"><input id="expirySearch" type="search" placeholder="ค้นหา SKU / Lot"><button class="btn btn-outline" id="exportExpiry">Export CSV</button></div></div>
+  <div class="table-scroll"><table><thead><tr><th>SKU</th><th>ชื่อสามัญ</th><th>Lot</th><th>คงเหลือ</th><th>สถานะ</th><th>วันหมดอายุ</th><th>เหลือ (วัน)</th><th>การติดตาม</th></tr></thead><tbody id="expiryRows"><tr><td colspan="8" class="empty">กำลังโหลดข้อมูล...</td></tr></tbody></table></div>
+ </div>
+ <div class="notice warn">ข้อควรระวัง: Dashboard ไม่เปลี่ยนสถานะล็อตให้อัตโนมัติ และไม่สร้างใบสั่งซื้อจริง ต้องตรวจสอบข้อมูล/อนุมัติก่อนดำเนินการ</div>
+</section>
+
+<section id="dispenseView" class="hidden">
+ <div class="page-head">
+  <div><h2>Dispensing Audit</h2><p>ตรวจสอบรายการจ่ายยาตามช่วงเวลาและติดตามรายการผิดปกติ</p></div>
+  <div class="filters">
+   <label class="filter">ตั้งแต่วันที่<input type="date" id="dateFrom"></label>
+   <label class="filter">ถึงวันที่<input type="date" id="dateTo"></label>
+   <button class="btn" id="applyDates">ใช้ช่วงวันที่</button>
+   <button class="btn btn-outline" id="resetDates">รีเซ็ต</button>
+  </div>
+ </div>
+ <div class="kpis" id="dispenseKpis"></div>
+ <div class="layout-2">
+  <div class="panel panel-corner"><h3>แนวโน้มจำนวนรายการจ่ายยา</h3><p class="panel-desc">นับเฉพาะ type = dispense ตามช่วงวันที่ที่เลือก</p><div id="dispenseTrend" class="chart-list"></div></div>
+  <div class="panel"><h3>จำนวนรายการแยกตามผู้จ่าย</h3><p class="panel-desc">นับเฉพาะรายการจ่าย ไม่รวม void</p><div id="pharmacistChart" class="chart-list"></div></div>
+ </div>
+ <div class="layout-2">
+  <div class="panel"><h3>SKU ที่มีรายการจ่ายสูงสุด</h3><p class="panel-desc">แสดงปริมาณพร้อมหน่วยของแต่ละ SKU แยกกัน ไม่รวมหน่วยต่างชนิดเข้าด้วยกัน</p><div id="topDispense" class="chart-list"></div></div>
+  <div class="panel"><h3>รายการที่ต้องตรวจสอบ</h3><p class="panel-desc">รายการยกเลิก, incident_ref และ SKU/Lot ที่ไม่พบคู่ในไฟล์ Stock</p><div id="auditSummary" class="legend-list"></div></div>
+ </div>
+ <div class="panel table-panel">
+  <div class="table-head"><h3>ประวัติการจ่ายยา</h3><div class="table-tools"><input id="logSearch" type="search" placeholder="ค้นหา ID / SKU / Lot / ผู้จ่าย"><select id="logType"><option value="">ทุกประเภท</option><option value="dispense">Dispense</option><option value="void">Void</option></select><button class="btn btn-outline" id="exportLogs">Export CSV</button></div></div>
+  <div class="table-scroll"><table><thead><tr><th>วันที่ / เวลา</th><th>Dispense ID</th><th>SKU</th><th>Lot</th><th>จำนวน</th><th>หน่วย</th><th>ผู้จ่าย</th><th>ประเภท</th><th>Incident</th><th>ตรวจ Lot</th></tr></thead><tbody id="logRows"><tr><td colspan="10" class="empty">กำลังโหลดข้อมูล...</td></tr></tbody></table></div>
+ </div>
+ <div class="notice" id="logNote">ตัวกรองวันที่มีผลกับ KPI, กราฟ และตารางรายการจ่ายยา</div>
+</section>
+
+<div id="emptyState" class="loading">กำลังโหลดข้อมูลจากระบบ หาก API ใช้งานไม่ได้จะใช้ไฟล์สำรองในโฟลเดอร์ data</div>
+
+<footer class="footer"><span>BESTDRUG · INVENTORY INTELLIGENCE</span><span>Data source: <span id="footerSource">/api/data</span> · <a href="./drug_dashboard.html">ทะเบียนยา</a></span></footer>
+</div>
+
+<script>
+'use strict';
+const state={drugs:null,stock:null,logs:null,filteredLogs:[],filteredStock:[],filteredExpiry:[],filteredDispense:[],source:'',asOf:''};
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n||0).toLocaleString('th-TH',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dateOnly=s=>s?String(s).slice(0,10):'';
+const dayDiff=(a,b)=>{const [ay,am,ad]=String(a).slice(0,10).split('-').map(Number),[by,bm,bd]=String(b).slice(0,10).split('-').map(Number);return Math.round((Date.UTC(ay,am-1,ad)-Date.UTC(by,bm-1,bd))/86400000)};
+const drugMap=()=>new Map((state.drugs?.items||[]).map(x=>[x.sku,x]));
+const lotMap=()=>new Map((state.stock?.items||[]).map(x=>[x.sku+'|'+x.lot,x]));
+const statusLabel=s=>({active:'Active',quarantine:'Quarantine',written_off:'Written off'}[s]||s||'ไม่ระบุ');
+const pill=s=>`<span class="pill ${s==='active'?'ok':s==='quarantine'?'warn':s==='written_off'?'dark':'bad'}">${esc(statusLabel(s))}</span>`;
+const allReady=()=>!!(state.drugs&&state.stock&&state.logs);
+function setSource(source,asOf){
+ state.source=source;state.asOf=asOf||'ไม่ระบุ';
+ const banner=$('sourceBanner');
+ if(source==='supabase'){banner.style.cssText='margin-bottom:16px;padding:12px 15px;border:1px solid #3f8500;background:#f1f8e8;color:#285900;font-weight:700';banner.textContent=`ข้อมูลจาก Supabase · as_of ${state.asOf}`;$('footerSource').textContent=`Supabase · as_of ${state.asOf}`;}
+ else{banner.style.cssText='margin-bottom:16px;padding:12px 15px;border:1px solid #d49a00;background:#fff5d6;color:#805800;font-weight:700';banner.textContent='ข้อมูลสำรองจากไฟล์ (ไม่ใช่ข้อมูลล่าสุด) · as_of '+state.asOf;$('footerSource').textContent='ไฟล์ JSON สำรอง · data/drugs_update.json, data/stock.json, data/dispense-log.json';}
+}
+async function fetchWithTimeout(url,ms=8000){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),ms);
+ try{const r=await fetch(url,{signal:controller.signal,cache:'no-store'});if(!r.ok)throw new Error('API status '+r.status);return await r.json();}
+ finally{clearTimeout(timer)}
+}
+async function loadData(){
+ try{
+  // อ่านข้อมูลจริงผ่าน API ของเราเองเท่านั้น ไม่เรียก Supabase จากหน้าเว็บ
+  const data=await fetchWithTimeout('/api/data',8000);
+  if(!data?.drugs?.items||!data?.stock?.items||!data?.dispense_log?.items)throw new Error('API response ไม่ครบ');
+  state.drugs=data.drugs;state.stock=data.stock;state.logs=data.dispense_log;
+  setSource('supabase',data.stock.meta?.as_of||'ไม่ระบุ');
+ }catch(err){
+  // ทางสำรอง: โหลด JSON ในโฟลเดอร์ data เมื่อ API ล้มเหลว/หมดเวลา/ข้อมูลไม่ครบ
+  const [drugs,stock,logs]=await Promise.all([
+   fetch('./data/drugs_update.json').then(r=>{if(!r.ok)throw Error('drugs fallback');return r.json()}),
+   fetch('./data/stock.json').then(r=>{if(!r.ok)throw Error('stock fallback');return r.json()}),
+   fetch('./data/dispense-log.json').then(r=>{if(!r.ok)throw Error('log fallback');return r.json()})
+  ]);
+  state.drugs=drugs;state.stock=stock;state.logs=logs;
+  setSource('fallback',stock.meta?.as_of||'ไม่ระบุ');
+ }
+ updateAll();
+}
+function setMode(mode){
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+ ['stock','expiry','dispense'].forEach(m=>$(m+'View').classList.toggle('hidden',m!==mode));
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+
+function updateMeta(){
+ const parts=[];
+ if(state.drugs)parts.push(`Drugs ${state.drugs.items.length}`);
+ if(state.stock)parts.push(`Stock ${state.stock.items.length} lots · as of ${state.stock.meta?.as_of||'ไม่ระบุ'}`);
+ if(state.logs)parts.push(`Logs ${state.logs.items.length} · ${state.logs.meta?.period||'ไม่ระบุช่วง'}`);
+ $('dataMeta').textContent=parts.length?parts.join('  |  '):'กำลังโหลดข้อมูลจาก /api/data';
+ $('emptyState').classList.toggle('hidden',allReady());if(allReady())$('emptyState').textContent='ข้อมูลพร้อมใช้งาน';
+}
+function activeTotals(){
+ const m=new Map();
+ (state.stock?.items||[]).filter(x=>x.status==='active'&&x.expiry&&dateOnly(x.expiry)>=String(state.stock.meta.as_of||'').slice(0,10)&&Number(x.qty_on_hand)>0).forEach(x=>m.set(x.sku,(m.get(x.sku)||0)+Number(x.qty_on_hand||0)));
+ return m;
+}
+function reorderRows(){
+ const dm=drugMap(), totals=activeTotals(), rows=[];
+ // Only evaluate SKUs that actually appear in the stock snapshot.
+ // Catalog items with no stock row are not automatically treated as zero-stock.
+ const present=new Set((state.stock?.items||[]).map(x=>x.sku));
+ for(const sku of present){
+  const d=dm.get(sku);
+  if(!d) continue;
+  const q=totals.get(sku)||0, level=Number(d.reorder_level||0);
+  if(level>0&&q<level)rows.push({sku,d,qty:q,gap:level-q,level});
+ }
+ return rows.sort((a,b)=>b.gap-a.gap);
+}
+function stockKpis(){
+ const items=state.stock.items, active=items.filter(x=>x.status==='active'&&x.expiry&&dateOnly(x.expiry)>=String(state.stock.meta.as_of||'').slice(0,10)&&Number(x.qty_on_hand)>0), quarantine=items.filter(x=>x.status==='quarantine'),written=items.filter(x=>x.status==='written_off');
+ const activeSku=new Set(active.filter(x=>Number(x.qty_on_hand)>0).map(x=>x.sku)).size;
+ const below=reorderRows().length;
+ const k=[['ล็อตทั้งหมด',items.length,'จำนวนแถวรายล็อต'],['SKU มี Stock',activeSku,`จากทะเบียนยา ${state.drugs.items.length} SKU`],['มูลค่าสต็อก Active','฿'+fmt(active.reduce((s,x)=>s+Number(x.qty_on_hand||0)*Number(x.unit_cost||0),0)),'เฉพาะล็อตใช้ได้ ณ as_of'],['Quarantine',quarantine.length,'ล็อตที่ต้องแยกตรวจสอบ'],['ต่ำกว่า Reorder',below,'คำนวณจากยอด Active รวมต่อ SKU']];
+ $('stockKpis').innerHTML=k.map((x,i)=>`<div class="kpi ${i===3&&x[1]>0?'alert':''}"><div class="kpi-label">${x[0]}</div><div class="kpi-value">${x[1]}</div><div class="kpi-note">${x[2]}</div></div>`).join('');
+ const statuses=[['Active',active.reduce((s,x)=>s+Number(x.qty_on_hand||0),0),'#76b900'],['Quarantine',quarantine.reduce((s,x)=>s+Number(x.qty_on_hand||0),0),'#df6500'],['Written off',written.reduce((s,x)=>s+Number(x.qty_on_hand||0),0),'#a7a7a7']];
+ const max=Math.max(1,...statuses.map(x=>x[1]));
+ $('stockStatusChart').innerHTML=statuses.map(x=>`<div class="bar-row"><span class="bar-label">${x[0]}</span><div class="track"><div class="fill" style="width:${x[1]/max*100}%;background:${x[2]}"></div></div><span class="bar-val">${fmt(x[1])}</span></div>`).join('');
+ const rr=reorderRows().slice(0,6);
+ $('reorderPreview').innerHTML=rr.length?rr.map(x=>`<div class="bar-row"><span class="bar-label"><b>${esc(x.sku)}</b></span><div class="track"><div class="fill" style="width:${Math.min(100,x.qty/x.level*100)}%"></div></div><span class="bar-val">${fmt(x.qty)} / ${fmt(x.level)}</span></div>`).join(''):'<div class="empty">ไม่พบ SKU ต่ำกว่า Reorder Level</div>';
+}
+function stockRows(){
+ const dm=drugMap(), status=$('stockStatus').value,cat=$('stockCategory').value,q=$('stockSearch').value.toLowerCase();
+ const rows=(state.stock?.items||[]).filter(x=>{
+  const d=dm.get(x.sku)||{};
+  return (!status||x.status===status)&&(!cat||d.category===cat)&&(!q||[x.sku,x.lot,d.generic_name].join(' ').toLowerCase().includes(q));
+ });
+ state.filteredStock=rows;
+ $('stockRows').innerHTML=rows.length?rows.map(x=>{
+  const d=dm.get(x.sku)||{},total=activeTotals().get(x.sku)||0;
+  return `<tr><td class="sku">${esc(x.sku)}</td><td>${esc(d.generic_name||'ไม่พบ SKU ใน Master')}</td><td>${esc(x.lot)}</td><td><b>${fmt(x.qty_on_hand)}</b></td><td>${esc(d.unit||'-')}</td><td>${pill(x.status)}</td><td>${esc(x.expiry||'ไม่ระบุ')}</td><td>${d.reorder_level?`${fmt(total)} / ${fmt(d.reorder_level)}`:'-'}</td></tr>`;
+ }).join(''):'<tr><td colspan="8" class="empty">ไม่พบข้อมูลตามตัวกรอง</td></tr>';
+}
+function expiryData(){
+ const asof=state.stock.meta?.as_of||'',windowDays=Number($('expiryWindow').value),status=$('expiryStatus').value;
+ return state.stock.items.filter(x=>(!status||x.status===status)&&Number(x.qty_on_hand)>0).map(x=>{
+  const days=x.expiry?dayDiff(x.expiry,asof):null;
+  const d=drugMap().get(x.sku)||{};
+  let action=!x.expiry?'ไม่ระบุวันหมดอายุ':days<0?'หมดอายุแล้ว':days<=windowDays?'ใกล้หมดอายุ':'ยังไม่ถึงช่วงเตือน';
+  return {...x,days,d,action};
+ }).filter(x=>!x.expiry||x.days<=windowDays||x.status==='quarantine').sort((a,b)=>(a.days??999999)-(b.days??999999));
+}
+function expiryKpis(){
+ const rows=expiryData(),asof=state.stock.meta?.as_of||'';
+ const expired=rows.filter(x=>x.expiry&&x.days<0),soon=rows.filter(x=>x.expiry&&x.days>=0&&x.days<=Number($('expiryWindow').value)),unknown=rows.filter(x=>!x.expiry),quar=state.stock.items.filter(x=>x.status==='quarantine');
+ const rr=reorderRows();
+ const k=[['หมดอายุแล้ว',expired.length,'ล็อตที่ยังมียอดคงเหลือ',expired.length?'alert':''],['ใกล้หมดอายุ',soon.length,`ภายใน ${$('expiryWindow').value} วัน`,''],['ไม่ระบุวันหมดอายุ',unknown.length,'ล็อตที่ต้องตรวจสอบ','alert'],['Quarantine',quar.length,'แยกจากยอดพร้อมจ่าย',''],['ควรพิจารณาสั่งซื้อ',rr.length,'SKU ต่ำกว่า Reorder','']];
+ $('expiryKpis').innerHTML=k.map(x=>`<div class="kpi ${x[3]}"><div class="kpi-label">${x[0]}</div><div class="kpi-value">${x[1]}</div><div class="kpi-note">${x[2]}</div></div>`).join('');
+}
+function renderExpiry(){
+ const rows=expiryData();state.filteredExpiry=rows;expiryKpis();
+ const timeline=rows.filter(x=>x.expiry&&x.days>=0&&x.days<=Number($('expiryWindow').value)).slice(0,8);
+ $('expiryTimeline').innerHTML=timeline.length?timeline.map(x=>`<div class="timeline-row"><span class="timeline-label">${esc(x.sku)}</span><div class="timeline-track"><div class="timeline-fill" style="width:${Math.max(3,100-x.days/Math.max(1,Number($('expiryWindow').value))*100)}%"></div></div><span>${x.days} วัน</span></div>`).join(''):'<div class="empty">ไม่มีล็อตใกล้หมดอายุตามช่วงที่เลือก</div>';
+ const rr=reorderRows().slice(0,8);
+ $('purchasePreview').innerHTML=rr.length?rr.map(x=>`<div class="bar-row"><span class="bar-label"><b>${esc(x.sku)}</b></span><div class="track"><div class="fill" style="width:${Math.min(100,x.qty/x.level*100)}%"></div></div><span class="bar-val">ขาด ${fmt(x.gap)}</span></div>`).join(''):'<div class="empty">ไม่พบรายการต่ำกว่าเกณฑ์</div>';
+ const q=$('expirySearch').value.toLowerCase();
+ const filtered=rows.filter(x=>[x.sku,x.lot,x.d.generic_name].join(' ').toLowerCase().includes(q));
+ $('expiryRows').innerHTML=filtered.length?filtered.map(x=>{
+  const tag=!x.expiry?'<span class="pill bad">ไม่ระบุวันหมดอายุ</span>':x.days<0?'<span class="pill bad">หมดอายุแล้ว</span>':x.days<=Number($('expiryWindow').value)?'<span class="pill warn">ใกล้หมดอายุ</span>':'<span class="pill ok">ยังไม่ถึงช่วงเตือน</span>';
+  return `<tr><td class="sku">${esc(x.sku)}</td><td>${esc(x.d.generic_name||'-')}</td><td>${esc(x.lot)}</td><td>${fmt(x.qty_on_hand)}</td><td>${pill(x.status)}</td><td>${esc(x.expiry||'-')}</td><td>${x.days===null?'-':x.days}</td><td>${tag}</td></tr>`;
+ }).join(''):'<tr><td colspan="8" class="empty">ไม่พบข้อมูลตามตัวกรอง</td></tr>';
+}
+function filteredLogs(){
+ const from=$('dateFrom').value,to=$('dateTo').value;
+ return state.logs.items.filter(x=>(!from||dateOnly(x.datetime)>=from)&&(!to||dateOnly(x.datetime)<=to));
+}
+function dispenseKpis(rows){
+ const disp=rows.filter(x=>x.type==='dispense'),voids=rows.filter(x=>x.type==='void'),returns=rows.filter(x=>x.type==='return'),inc=rows.filter(x=>x.incident_ref||x.ref_dispense_id);
+ const sku=new Set(disp.map(x=>x.sku)).size,patients=new Set(disp.map(x=>x.patient_code).filter(Boolean)).size;
+ const k=[['รายการจ่ายยา',disp.length,'เฉพาะ type = dispense'],['SKU ที่จ่าย',sku,'จำนวน SKU ไม่ซ้ำ'],['ผู้รับบริการ (รหัสแฝง)',patients,'จำนวน patient_code ไม่ซ้ำ'],['รายการ Void',voids.length,'แสดงแยกจากรายการจ่าย',voids.length?'alert':''],['รายการ Return',returns.length,'แสดงแยกจากรายการจ่าย',''],['Incident',inc.length,'รายการอ้างอิงเหตุการณ์',inc.length?'alert':'']];
+ $('dispenseKpis').innerHTML=k.map(x=>`<div class="kpi ${x[3]||''}"><div class="kpi-label">${x[0]}</div><div class="kpi-value">${x[1]}</div><div class="kpi-note">${x[2]}</div></div>`).join('');
+}
+function renderDispense(){
+ const rows=filteredLogs();state.filteredLogs=rows;
+ const disp=rows.filter(x=>x.type==='dispense');dispenseKpis(rows);
+ const daily=new Map();disp.forEach(x=>{const d=dateOnly(x.datetime);daily.set(d,(daily.get(d)||0)+1)});
+ const dayEntries=[...daily.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+ const compact=dayEntries.length>20?dayEntries.filter((x,i)=>i%Math.ceil(dayEntries.length/20)===0||i===dayEntries.length-1):dayEntries;
+ const max=Math.max(1,...compact.map(x=>x[1]));
+ $('dispenseTrend').innerHTML=compact.length?compact.map(x=>`<div class="bar-row"><span class="bar-label">${x[0]}</span><div class="track"><div class="fill" style="width:${x[1]/max*100}%"></div></div><span class="bar-val">${x[1]} ครั้ง</span></div>`).join(''):'<div class="empty">ไม่มีรายการจ่ายในช่วงวันที่เลือก</div>';
+ const ph=new Map();disp.forEach(x=>ph.set(x.pharmacist_code,(ph.get(x.pharmacist_code)||0)+1));
+ const phs=[...ph.entries()].sort((a,b)=>b[1]-a[1]),pmax=Math.max(1,...phs.map(x=>x[1]));
+ $('pharmacistChart').innerHTML=phs.length?phs.map(x=>`<div class="bar-row"><span class="bar-label">${esc(x[0])}</span><div class="track"><div class="fill" style="width:${x[1]/pmax*100}%"></div></div><span class="bar-val">${x[1]}</span></div>`).join(''):'<div class="empty">ไม่มีข้อมูล</div>';
+ const by=new Map();disp.forEach(x=>{const d=drugMap().get(x.sku)||{};const key=x.sku;const cur=by.get(key)||{qty:0,unit:d.unit||'หน่วย',name:d.generic_name||''};cur.qty+=Number(x.qty||0);by.set(key,cur)});
+ const top=[...by.entries()].sort((a,b)=>b[1].qty-a[1].qty).slice(0,8),tmax=Math.max(1,...top.map(x=>x[1].qty));
+ $('topDispense').innerHTML=top.length?top.map(x=>`<div class="bar-row"><span class="bar-label"><b>${esc(x[0])}</b></span><div class="track"><div class="fill" style="width:${Math.max(0,x[1].qty)/tmax*100}%"></div></div><span class="bar-val">${fmt(x[1].qty)} ${esc(x[1].unit)}</span></div>`).join(''):'<div class="empty">ไม่มีข้อมูล</div>';
+ const voidCount=rows.filter(x=>x.type==='void').length,returnCount=rows.filter(x=>x.type==='return').length,incCount=rows.filter(x=>x.incident_ref||x.ref_dispense_id).length;
+ const stockLots=lotMap(),mismatch=disp.filter(x=>!stockLots.has(x.sku+'|'+x.lot)).length;
+ $('auditSummary').innerHTML=`<div class="legend-row"><span class="swatch red"></span>รายการ Void <b>${voidCount}</b></div><div class="legend-row"><span class="swatch orange"></span>รายการมี Incident <b>${incCount}</b></div><div class="legend-row"><span class="swatch orange"></span>รายการ Return <b>${returnCount}</b></div><div class="legend-row"><span class="swatch black"></span>SKU + Lot ไม่พบใน Stock <b>${mismatch}</b></div>`;
+ const q=$('logSearch').value.toLowerCase(),type=$('logType').value;
+ const show=rows.filter(x=>(!type||x.type===type)&&[x.dispense_id,x.sku,x.lot,x.pharmacist_code,x.patient_code].join(' ').toLowerCase().includes(q)).sort((a,b)=>String(b.datetime).slice(0,16).localeCompare(String(a.datetime).slice(0,16)));
+ $('logRows').innerHTML=show.length?show.map(x=>{
+  const d=drugMap().get(x.sku)||{},match=stockLots.has(x.sku+'|'+x.lot);
+  return `<tr><td>${esc(String(x.datetime).slice(0,16).replace('T',' '))}</td><td>${esc(x.dispense_id)}</td><td class="sku">${esc(x.sku)}</td><td>${esc(x.lot)}</td><td>${fmt(x.qty)}</td><td>${esc(d.unit||'-')}</td><td>${esc(x.pharmacist_code||'-')}</td><td>${x.type==='void'?'<span class="pill warn">Void</span>':x.type==='return'?'<span class="pill dark">Return</span>':'<span class="pill ok">Dispense</span>'}</td><td>${(x.incident_ref||x.ref_dispense_id)?`<span class="pill bad">${esc(x.incident_ref||x.ref_dispense_id)}</span>`:'-'}</td><td>${match?'<span class="pill ok">พบ Lot</span>':'<span class="pill bad">ไม่พบคู่ SKU/Lot</span>'}</td></tr>`;
+ }).join(''):'<tr><td colspan="10" class="empty">ไม่พบรายการตามตัวกรอง</td></tr>';
+ const period=state.logs.meta?.period||'ข้อมูลทั้งหมดจาก API';
+ const outside=rows.filter(x=>state.logs.meta?.period&&!(`${state.logs.meta.period.split(' ถึง ')[0]}`<=dateOnly(x.datetime)&&dateOnly(x.datetime)<=`${state.logs.meta.period.split(' ถึง ')[1]}`)).length;
+ $('logNote').textContent=`ช่วงข้อมูลที่ระบุในไฟล์: ${period}. ช่วงที่เลือกแสดง ${rows.length} รายการ (จ่าย ${disp.length}, void ${voidCount}). ${outside?`พบ ${outside} รายการอยู่นอกช่วง period ที่ระบุใน metadata — โปรดตรวจสอบ`:''}`;
+}
+function updateCategories(){
+ const sel=$('stockCategory');if(!state.drugs)return;
+ const current=sel.value, cats=[...new Set(state.drugs.items.map(x=>x.category).filter(Boolean))].sort();
+ sel.innerHTML='<option value="">ทุกหมวดหมู่</option>'+cats.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');sel.value=current;
+}
+function updateAll(){
+ updateMeta();
+ if(!allReady())return;
+ updateCategories();
+ const from=state.logs.meta?.period?.split(' ถึง ')[0]||'',to=state.logs.meta?.period?.split(' ถึง ')[1]||'';
+ if(!$('dateFrom').value)$('dateFrom').value=from||'';
+ if(!$('dateTo').value)$('dateTo').value=to||'';
+ $('stockNote').textContent=`Stock as of ${state.stock.meta?.as_of||'ไม่ระบุ'} · แหล่งข้อมูล ${state.source==='supabase'?'Supabase':'ไฟล์ JSON สำรอง'} · ยอดใช้ได้คิดเฉพาะ Active ที่ยังไม่หมดอายุ`;
+ stockKpis();stockRows();renderExpiry();renderDispense();
+}
+['stockStatus','stockCategory','stockSearch'].forEach(id=>$(id).addEventListener('input',()=>{if(allReady())stockRows()}));
+['expiryWindow','expiryStatus','expirySearch'].forEach(id=>$(id).addEventListener('input',()=>{if(allReady())renderExpiry()}));
+$('applyDates').addEventListener('click',()=>{if(allReady())renderDispense()});
+$('resetDates').addEventListener('click',()=>{if(!allReady())return;$('dateFrom').value=state.logs.meta?.period?.split(' ถึง ')[0]||'';$('dateTo').value=state.logs.meta?.period?.split(' ถึง ')[1]||'';renderDispense()});
+['logSearch','logType'].forEach(id=>$(id).addEventListener('input',()=>{if(allReady())renderDispense()}));
+function csvDownload(name,rows){
+ if(!rows.length){alert('ไม่มีข้อมูลสำหรับส่งออก');return}
+ const cols=[...new Set(rows.flatMap(x=>Object.keys(x)))];
+ const csv=[cols.join(','),...rows.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+$('exportStock').addEventListener('click',()=>csvDownload('stock-lots.csv',state.filteredStock.map(x=>({sku:x.sku,lot:x.lot,qty_on_hand:x.qty_on_hand,status:x.status,expiry:x.expiry||''}))));
+$('exportExpiry').addEventListener('click',()=>csvDownload('expiry-follow-up.csv',state.filteredExpiry.map(x=>({sku:x.sku,lot:x.lot,qty:x.qty_on_hand,status:x.status,expiry:x.expiry||'',days_to_expiry:x.days??'',action:x.action}))));
+$('exportLogs').addEventListener('click',()=>csvDownload('dispense-log-filtered.csv',state.filteredLogs.map(x=>({...x}))));
+loadData().catch(err=>{$('sourceBanner').textContent='ทดสอบผ่านลิงก์ Vercel เท่านั้น (Live Server ไม่รัน /api)';$('emptyState').textContent='ทดสอบผ่านลิงก์ Vercel เท่านั้น (Live Server ไม่รัน /api)';console.error(err)});
+</script>
+</body>
+</html>
